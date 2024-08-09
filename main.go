@@ -21,14 +21,13 @@ func heartbeat(heartbeat_interval int) {
 	ticker := time.NewTicker(time.Millisecond * time.Duration(heartbeat_interval))
 	for {
 		tm := <-ticker.C
-		fmt.Println("Heartbeat", tm)
+		fmt.Println("💕 Heartbeat 💕 at:", tm)
 		ch <- 1
 	}
 }
 func responseWriter(ws *websocket.Conn, token string) {
 	for {
 		opCode := <-ch
-		fmt.Println(opCode)
 		switch opCode {
 		case 1:
 			ws.WriteJSON(map[string]interface{}{
@@ -97,6 +96,7 @@ func main() {
 			opCode = data["op"].(float64)
 		}
 		seq = int(opCode)
+		fmt.Println("Dispacth code:", opCode)
 		switch opCode {
 		case 10:
 			if !ready {
@@ -122,7 +122,7 @@ func main() {
 		switch status {
 
 		case "READY":
-			fmt.Println("Gateway ready")
+			fmt.Println("READY")
 			d := data["d"].(map[string]interface{})
 			sessionId = d["session_id"].(string)
 			resumeGatewayUrl = d["resume_gateway_url"].(string)
@@ -132,9 +132,11 @@ func main() {
 			content := d["content"].(string)
 			author := d["author"].(map[string]interface{})
 			username := author["username"].(string)
-			fmt.Println(username, " said ", content)
+			fmt.Println(username, "said", content)
 		default:
-			fmt.Println(status)
+			if status != nil {
+				fmt.Println("Status:", status)
+			}
 		}
 
 	}
