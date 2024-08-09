@@ -18,11 +18,8 @@ func heartbeat(heartbeat_interval int, c *websocket.Conn) {
 	go func() {
 		for {
 			time.Sleep(time.Millisecond * time.Duration(heartbeat_interval))
-			payload, _ := json.Marshal(map[string]interface{}{
-				"op": 1,
-				"d":  nil,
-			})
-			if err := c.WriteMessage(1, payload); err != nil {
+			if err := c.WriteJSON(map[string]interface{}{"op": 1,
+				"d": nil}); err != nil {
 				fmt.Println("Heartbeat ", err)
 			}
 		}
@@ -71,30 +68,23 @@ func main() {
 				heartbeat(heartbeat_interval, conn)
 			}
 			ready = true
-			// payload, err := json.Marshal(map[string]interface{}{
-			// 	"op": 2,
-			// 	"d": map[string]interface{}{
-			// 		"token":   token,
-			// 		"intents": 512,
-			// 	},
-			// })
-			// if err != nil {
-			// 	fmt.Println(err)
-			// }
-			// if err := conn.WriteMessage(messageType, payload); err != nil {
-			// 	fmt.Println("Write intents", err)
-			// }
+			err := conn.WriteJSON(map[string]interface{}{
+				"op": 2,
+				"d": map[string]interface{}{
+					"token":   token,
+					"intents": 512,
+					"properties": map[string]interface{}{
+						"os":      "macos",
+						"browser": "chrome",
+						"device":  "macbook air",
+					},
+				},
+			})
+			if err != nil {
+				fmt.Println("Intents err ", err)
+			}
 
 		}
-
-		// dataBytes, err := json.Marshal(map[string]interface{}{"op": 2, "d": map[string]interface{}{}})
-		// if err != nil {
-		// 	fmt.Println("Databytes", err)
-		// 	return
-		// }
-		// if err := conn.WriteMessage(messageType, dataBytes); err != nil {
-		// 	fmt.Println("Write ", err)
-		// }
 
 	}
 }
