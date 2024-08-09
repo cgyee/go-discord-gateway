@@ -12,7 +12,7 @@ import (
 )
 
 var ready bool = false
-var ch = make(chan int)
+var ch = make(chan int, 5)
 var resumeGatewayUrl string
 var sessionId string
 var seq int
